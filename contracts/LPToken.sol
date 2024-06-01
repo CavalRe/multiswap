@@ -8,7 +8,7 @@
  */
 // Copyright (C) 2020-2023, CavalRe Inc. All rights reserved.
 // See the file LICENSE.md for licensing terms.
-pragma solidity 0.8.19;
+pragma solidity 0.8.24;
 
 import {ILPToken} from "./interfaces/ILPToken.sol";
 import {Users} from "./Users.sol";
@@ -31,7 +31,7 @@ contract LPToken is ILPToken, ERC20, Users {
     constructor(
         string memory name_,
         string memory symbol_
-    ) ERC20(name_, symbol_) {
+    ) ERC20(name_, symbol_) Users(_msgSender()) {
         _tokensPerShare = 1e18;
         _protocolFeeRecipient = _msgSender();
     }
@@ -66,36 +66,13 @@ contract LPToken is ILPToken, ERC20, Users {
         return super.transferFrom(from, to, shares);
     }
 
-    function _transfer(
+    function _update(
         address from,
         address to,
         uint256 shares
     ) internal override {
         if (_isBlocked[to]) revert UserNotAllowed(to);
-        return super._transfer(from, to, shares);
-    }
-
-    function _mint(address account, uint256 shares) internal override {
-        if (_isBlocked[account]) revert UserNotAllowed(account);
-        super._mint(account, shares);
-        _totalTokens = totalSupply().mulWadUp(_tokensPerShare);
-    }
-
-    function _burn(address account, uint256 shares) internal override {
-        super._burn(account, shares);
-        _totalTokens = totalSupply().mulWadUp(_tokensPerShare);
-    }
-
-    function _distributeTokens(
-        uint256 amount // tokens
-    ) internal {
-        _totalTokens += amount;
-        _tokensPerShare = _totalTokens.divWadUp(totalSupply());
-    }
-
-    function _allocateShares(address recipient, uint256 shares) internal {
-        super._mint(recipient, shares);
-        _tokensPerShare = _totalTokens.divWadUp(totalSupply());
+        return super._update(from, to, shares);
     }
 
     function protocolFee() public view returns (uint256) {

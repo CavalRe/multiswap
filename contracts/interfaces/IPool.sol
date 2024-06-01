@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Business Source License 1.1
 // Copyright (C) 2020-2023, CavalRe Inc. All rights reserved.
 // See the file LICENSE.md for licensing terms.
-pragma solidity 0.8.19;
+pragma solidity 0.8.24;
 
 import {ILPToken} from "./ILPToken.sol";
 
@@ -13,9 +13,7 @@ struct PoolState {
     int256 omega;
     uint256 tokensPerShare; // LP token price per share
     uint256 balance; // # of LP tokens
-    uint256 meanBalance;
     uint256 scale;
-    uint256 meanScale;
     uint256 lastUpdated;
 }
 
@@ -28,10 +26,20 @@ struct AssetState {
     uint256 conversion;
     uint256 fee;
     uint256 balance;
-    uint256 meanBalance;
     uint256 scale;
-    uint256 meanScale;
     uint256 lastUpdated;
+}
+
+struct State {
+    PoolState pool;
+    mapping(address => AssetState) assets;
+    address[] assetAddresses;
+    mapping(address => uint256) discount;
+}
+
+struct Order {
+    address token;
+    uint256 amount;
 }
 
 interface IPool is ILPToken {
@@ -49,9 +57,7 @@ interface IPool is ILPToken {
     event BalanceUpdate(
         uint256 indexed txCount,
         address indexed token,
-        uint256 balance,
-        uint256 meanBalance,
-        uint256 userBalance
+        uint256 balance
     );
 
     event Multiswap(
@@ -136,6 +142,8 @@ interface IPool is ILPToken {
 
     error InvalidUnstake(address receiveToken);
 
+    error InvariantViolation(uint256 valueIn, uint256 valueOut);
+
     error LengthMismatch(uint256 expected, uint256 actual);
 
     error LPTokenFirst();
@@ -185,92 +193,92 @@ interface IPool is ILPToken {
 
     function isPaused() external view returns (bool);
 
-    function _quoteMultiswap(
-        address sender,
-        address[] memory payTokens,
-        uint256[] memory amounts,
-        address[] memory receiveTokens,
-        uint256[] memory allocations
-    )
-        external
-        view
-        returns (uint256[] memory receiveAmounts, uint256 feeAmount);
+    // function _quoteMultiswap(
+    //     address sender,
+    //     address[] memory payTokens,
+    //     uint256[] memory amounts,
+    //     address[] memory receiveTokens,
+    //     uint256[] memory allocations
+    // )
+    //     external
+    //     view
+    //     returns (uint256[] memory receiveAmounts, uint256 feeAmount);
 
-    function quoteMultiswap(
-        address[] memory payTokens,
-        uint256[] memory amounts,
-        address[] memory receiveTokens,
-        uint256[] memory allocations
-    )
-        external
-        view
-        returns (uint256[] memory receiveAmounts, uint256 feeAmount);
+    // function quoteMultiswap(
+    //     address[] memory payTokens,
+    //     uint256[] memory amounts,
+    //     address[] memory receiveTokens,
+    //     uint256[] memory allocations
+    // )
+    //     external
+    //     view
+    //     returns (uint256[] memory receiveAmounts, uint256 feeAmount);
 
-    function multiswap(
-        address[] memory payTokens,
-        uint256[] memory amounts,
-        address[] memory receiveTokens,
-        uint256[] memory allocations,
-        uint256[] memory minReceiveAmounts
-    )
-        external
-        payable
-        returns (uint256[] memory receiveAmounts, uint256 feeAmount);
+    // function multiswap(
+    //     address[] memory payTokens,
+    //     uint256[] memory amounts,
+    //     address[] memory receiveTokens,
+    //     uint256[] memory allocations,
+    //     uint256[] memory minReceiveAmounts
+    // )
+    //     external
+    //     payable
+    //     returns (uint256[] memory receiveAmounts, uint256 feeAmount);
 
-    function quoteSwap(
-        address payToken,
-        address receiveToken,
-        uint256 payAmount
-    ) external returns (uint256 receiveAmount, uint256 feeAmount);
+    // function quoteSwap(
+    //     address payToken,
+    //     address receiveToken,
+    //     uint256 payAmount
+    // ) external returns (uint256 receiveAmount, uint256 feeAmount);
 
-    function swap(
-        address payToken,
-        address receiveToken,
-        uint256 payAmount,
-        uint256 minReceiveAmount
-    ) external payable returns (uint256 receiveAmount, uint256 feeAmount);
+    // function swap(
+    //     address payToken,
+    //     address receiveToken,
+    //     uint256 payAmount,
+    //     uint256 minReceiveAmount
+    // ) external payable returns (uint256 receiveAmount, uint256 feeAmount);
 
-    function quoteStake(
-        address payToken,
-        uint256 payAmount
-    ) external returns (uint256 receiveAmount, uint256 feeAmount);
+    // function quoteStake(
+    //     address payToken,
+    //     uint256 payAmount
+    // ) external returns (uint256 receiveAmount, uint256 feeAmount);
 
-    function stake(
-        address payToken,
-        uint256 payAmount,
-        uint256 minReceiveAmount
-    ) external payable returns (uint256 receiveAmount, uint256 feeAmount);
+    // function stake(
+    //     address payToken,
+    //     uint256 payAmount,
+    //     uint256 minReceiveAmount
+    // ) external payable returns (uint256 receiveAmount, uint256 feeAmount);
 
-    function quoteUnstake(
-        address receiveToken,
-        uint256 payAmount
-    ) external returns (uint256 receiveAmount, uint256 feeAmount);
+    // function quoteUnstake(
+    //     address receiveToken,
+    //     uint256 payAmount
+    // ) external returns (uint256 receiveAmount, uint256 feeAmount);
 
-    function unstake(
-        address receiveToken,
-        uint256 payAmount,
-        uint256 minReceiveAmount
-    ) external returns (uint256 receiveAmount, uint256 feeAmount);
+    // function unstake(
+    //     address receiveToken,
+    //     uint256 payAmount,
+    //     uint256 minReceiveAmount
+    // ) external returns (uint256 receiveAmount, uint256 feeAmount);
 
-    function quoteAddLiquidity(
-        address token,
-        uint256 amount
-    ) external returns (uint256[] memory payAmounts);
+    // function quoteAddLiquidity(
+    //     address token,
+    //     uint256 amount
+    // ) external returns (uint256[] memory payAmounts);
 
-    function addLiquidity(
-        address token,
-        uint256 amount,
-        uint256[] memory maxPayAmounts
-    ) external payable returns (uint256[] memory payAmounts);
+    // function addLiquidity(
+    //     address token,
+    //     uint256 amount,
+    //     uint256[] memory maxPayAmounts
+    // ) external payable returns (uint256[] memory payAmounts);
 
-    function quoteRemoveLiquidity(
-        uint256 amount
-    ) external returns (uint256[] memory receiveAmounts, uint256 feeAmount);
+    // function quoteRemoveLiquidity(
+    //     uint256 amount
+    // ) external returns (uint256[] memory receiveAmounts, uint256 feeAmount);
 
-    function removeLiquidity(
-        uint256 amount,
-        uint256[] memory minReceiveAmounts
-    ) external returns (uint256[] memory receiveAmounts, uint256 feeAmount);
+    // function removeLiquidity(
+    //     uint256 amount,
+    //     uint256[] memory minReceiveAmounts
+    // ) external returns (uint256[] memory receiveAmounts, uint256 feeAmount);
 
     function setIsAllowed(address user_, bool isAllowed_) external;
 

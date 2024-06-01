@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: Unlicense
-pragma solidity 0.8.19;
+pragma solidity 0.8.24;
 
 import "../contracts/Pool.sol";
 import "./Token.t.sol";
-import "forge-std/Test.sol";
+import "forge-std/src/Test.sol";
 
 contract PoolTest is Test {
     using FixedPointMathLib for uint256;

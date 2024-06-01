@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "forge-std/Test.sol";
+import "forge-std/src/Test.sol";
 
 contract Token is ERC20, Test {
     uint8 private _decimals;

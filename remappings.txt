@@ -1,4 +1,5 @@
+@cavalre/=node_modules/@cavalre/
 @openzeppelin/=node_modules/@openzeppelin/
-ds-test/=test/libraries/ds-test/src/
-forge-std/=node_modules/forge-std/src/
+ds-test/=tests/libraries/ds-test/src/
+forge-std/=node_modules/forge-std/
 solady/=node_modules/solady/

@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: Business Source License 1.1
 // Copyright (C) 2020-2023, CavalRe Inc. All rights reserved.
 // See the file LICENSE.md for licensing terms.
-pragma solidity 0.8.19;
+pragma solidity 0.8.24;
 
 import {IUsers} from "./interfaces/IUsers.sol";
-import {Ownable2Step} from "@openzeppelin/contracts/access/Ownable2Step.sol";
+import {Ownable2Step, Ownable} from "@openzeppelin/contracts/access/Ownable2Step.sol";
 
 contract Users is IUsers, Ownable2Step {
     uint256 internal constant ONE = 1e18;
@@ -12,6 +12,8 @@ contract Users is IUsers, Ownable2Step {
 
     mapping(address => bool) internal _isBlocked;
     mapping(address => uint256) internal _discount;
+
+    constructor(address initialOwner) Ownable(initialOwner) {}
 
     function isAllowed(address user_) public view returns (bool) {
         return !_isBlocked[user_];

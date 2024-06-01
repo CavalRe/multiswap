@@ -6,9 +6,9 @@ require('dotenv').config();
 module.exports = {
   defaultNetwork: "avax",
   solidity: {
-    version: "0.8.19",
+    version: "0.8.24",
     settings: {
-      evmVersion: "london",
+      evmVersion: "cancun",
       optimizer: {
         enabled: true,
         runs: 200,
@@ -55,7 +55,7 @@ module.exports = {
   },
   paths: {
     sources: "./contracts",
-    tests: "./test",
+    tests: "./tests",
     cache: "./cache",
     artifacts: "./artifacts",
     scripts: "./scripts",

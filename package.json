@@ -2,22 +2,22 @@
   "name": "amm",
   "version": "0.1.0",
   "description": "Multiswap",
-  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "",
   "dependencies": {
-    "@openzeppelin/contracts": "^4.9.2",
-    "dotenv": "^16.3.1",
-    "forge-std": "github:foundry-rs/forge-std#v1.6.0",
+    "@cavalre/contracts": "github:CavalRe/cavalre-contracts",
+    "@openzeppelin/contracts": "^5.0.2",
     "solady": "^0.0.110"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-ethers": "^3.0.4",
     "@nomicfoundation/hardhat-verify": "^2.0.0",
+    "dotenv": "^16.3.1",
     "ethers": "^6.1.0",
+    "forge-std": "github:foundry-rs/forge-std#v1.6.0",
     "hardhat": "^2.18.3"
   }
 }

@@ -4,6 +4,7 @@ coverage
 coverage.json
 typechain
 .DS_Store
+.vscode
 
 #Hardhat files
 cache
@@ -15,3 +16,5 @@ olympext.vsix
 contracts/Pool.flattened.sol
 
 cache_hardhat
+
+_tests
